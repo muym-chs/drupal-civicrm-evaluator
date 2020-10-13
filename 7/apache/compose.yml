@@ -1,0 +1,84 @@
+services:
+  vhttp:
+    build:
+      context: .
+      dockerfile: drupal/Dockerfile
+    depends_on:
+      vsql:
+        condition: service_started
+    environment:
+      CIVICRM_DATABASE: civicrm_evaluator
+      DRUPAL_DATABASE: drupal_evaluator
+      MYSQL_PASSWORD: raJPvisYyC
+      MYSQL_USER: evaluator
+      VSITE: null
+      VSITE_DOMAIN: localhost:8080
+      VSITE_ENVIRONMENT: null
+    ports:
+    - protocol: tcp
+      target: 80
+    - published: 8080
+      target: 80
+    volumes:
+    - ./../../app/drupal/7/:/var/www/html:rw
+  admin:
+    build:
+      context: .
+      dockerfile: admin/Dockerfile
+    depends_on:
+      vhttp:
+        condition: service_started
+      vsql:
+        condition: service_started
+    environment:
+      CIVICRM_DATABASE: drupal_evaluator
+      #civicrm_evaluator
+      DRUPAL_DATABASE: drupal_evaluator
+      MYSQL_DATABASE: drupal_evaluator
+      MYSQL_PASSWORD: raJPvisYyC
+      MYSQL_ROOT_PASSWORD: raJPvisYyC
+      MYSQL_USER: evaluator
+      VSITE: evaluate
+      VSITE_ADMIN_MAIL: evaluator@example.org
+      VSITE_ADMIN_NAME: evaluator
+      VSITE_CIVICRM_VER: null
+      VSITE_DOMAIN: localhost:8080
+      VSITE_ENVIRONMENT: null
+      VSITE_FEATURE: null
+      VSITE_SITE_NAME: CiviCRM Evaluator
+      VSITE_THEME: null
+      VSITE_USER_MAIL: null
+      VSITE_USER_NAME: null
+      VSITE_USER_ROLE: null
+    volumes:
+    - ./../../app/drupal/7/:/var/www/html:rw
+  vsql:
+    environment:
+      MYSQL_DATABASE: drupal_evaluator
+      MYSQL_PASSWORD: raJPvisYyC
+      MYSQL_ROOT_PASSWORD: raJPvisYyC
+      MYSQL_USER: evaluator
+      VSITE_ENVIRONMENT: null
+    image: blackflysolutions/mariadb:10.1
+    volumes:
+    - vdb:/var/lib/mysql:rw
+version: '3'
+volumes:
+  vdb: {}
+  vsite: {}
+
+#COMPOSE_PROJECT_NAME=evaluate
+##VSITE=evaluate
+##VSITE_COMPOSE_PROJECT=7/apache/
+# use a simple docker-compose flavoured docker-compose file
+#VSITE_COMPOSE_PROJECT_VARIANT=compose
+##MYSQL_USER=evaluator
+##MYSQL_PASSWORD=raJPvisYyC
+##MYSQL_ROOT_PASSWORD=raJPvisYyC
+##MYSQL_DATABASE=drupal_evaluator
+##DRUPAL_DATABASE=drupal_evaluator
+##CIVICRM_DATABASE=civicrm_evaluator
+##VSITE_DOMAIN=localhost:1978
+##VSITE_SITE_NAME=CiviCRM Evaluator
+##VSITE_ADMIN_NAME=evaluator
+##VSITE_ADMIN_MAIL=evaluator@example.org
